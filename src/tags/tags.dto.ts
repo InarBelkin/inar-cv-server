@@ -1,4 +1,4 @@
-import { Post } from '../posts/post';
+import { Post } from '../posts/post.entity';
 
 export class TagGetDto {
   id: number;

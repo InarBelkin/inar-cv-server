@@ -1,5 +1,5 @@
 import { Column, Entity, ManyToMany, PrimaryGeneratedColumn } from 'typeorm';
-import { Post } from '../posts/post';
+import { Post } from '../posts/post.entity';
 
 @Entity()
 export class Tag {

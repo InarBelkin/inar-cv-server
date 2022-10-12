@@ -21,6 +21,9 @@ export class Post {
   @Column()
   content: string;
 
+  @Column()
+  date: Date;
+
   @ManyToMany(() => Tag, (tag) => tag.posts)
   @JoinTable()
   tags: Tag[];

@@ -1,7 +1,14 @@
-export class PostListDto {
+export class PostListItemDto {
+  id: number;
   title: string;
   contentPreview: string;
+  date: Date;
   tags: { id: number; name: string }[];
+}
+
+export class PostListDto {
+  data: PostListItemDto[];
+  pageCount: number | null;
 }
 
 export class PostListFilter {
@@ -11,7 +18,9 @@ export class PostListFilter {
 }
 
 export class OnePostDto {
+  id: number;
   title: string;
+  date: Date;
   contentPreview: string;
   content: string;
   tags: { id: number; name: string }[];
