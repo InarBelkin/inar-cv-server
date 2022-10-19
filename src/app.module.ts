@@ -1,8 +1,12 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { PostsModule } from './posts/posts.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { TagsModule } from './tags/tags.module';
+import { UsersModule } from './users/users.module';
+import { AuthModule } from './auth/auth.module';
+import { LoggerMiddleware } from './MiddleHuyna';
+import { RolesModule } from './roles/roles.module';
 
 @Module({
   imports: [
@@ -26,8 +30,15 @@ import { TagsModule } from './tags/tags.module';
     }),
     PostsModule,
     TagsModule,
+    UsersModule,
+    AuthModule,
+    RolesModule,
   ],
   controllers: [],
   providers: [],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(LoggerMiddleware).forRoutes('auth');
+  }
+}

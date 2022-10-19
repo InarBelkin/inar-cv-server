@@ -5,11 +5,11 @@ WORKDIR /app
 COPY package.json ./
 COPY yarn.lock ./
 
-RUN yarn install
-
 COPY  . .
 
 COPY ./dist ./dist
+
+RUN yarn install
 
 CMD ["yarn", "run", "start:debug"]
 
