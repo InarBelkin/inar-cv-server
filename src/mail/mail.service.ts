@@ -25,7 +25,7 @@ export class MailService {
       text: '',
       html: `
       <div>
-        <h1>For activation  </h1>
+        <h1>Click to activate your profile:</h1>
         <a href="${link}">${link}</a>
       </div>
       `,

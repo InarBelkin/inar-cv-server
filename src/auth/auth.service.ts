@@ -46,7 +46,7 @@ export class AuthService {
 
     const user = {
       id: null,
-      email: registerDto.email,
+      email: registerDto.email.toLowerCase(),
       isActivated: false,
       refreshToken: null,
       activationCode: randomUUID(),
@@ -65,7 +65,12 @@ export class AuthService {
   async validateUser(username: string, pass: string): Promise<UserDto | null> {
     const user = await this.userService.findByUsername(username);
     if (user && (await bcrypt.compare(pass, user.hashPassword))) {
-      const { hashPassword, ...result } = user;
+      const result = {
+        id: user.id,
+        email: user.email,
+        username: user.username,
+        roles: user.roles,
+      } as UserDto;
       return result;
     }
     return null;
@@ -77,13 +82,15 @@ export class AuthService {
 
   async login(user: UserDto, userAgent: any) {
     const accessPayload = {
-      username: user.username,
       sub: user.id,
+      username: user.username,
+      email: user.email,
       roles: user.roles,
     };
     const refreshPayload = {
-      username: user.username,
       sub: user.id,
+      username: user.username,
+      email: user.email,
       roles: user.roles,
       userAgent: userAgent,
       random: Math.random().toString(),
@@ -93,6 +100,7 @@ export class AuthService {
       accessToken: this.jwtService.sign(accessPayload),
       refreshToken: this.jwtService.sign(refreshPayload, {
         expiresIn: '2 days',
+        secret: process.env.AUTH_JWT_REFRESH_SECRET,
       }),
     };
 
@@ -103,12 +111,14 @@ export class AuthService {
   async refresh({ refreshToken }: RefreshDto, userAgent: any) {
     let refreshPayload: RefreshPayload;
     try {
-      refreshPayload = this.jwtService.verify(refreshToken);
+      refreshPayload = this.jwtService.verify(refreshToken, {
+        secret: process.env.AUTH_JWT_REFRESH_SECRET,
+      });
     } catch (e) {
       throw new UnauthorizedException(e, 'jwt expired');
     }
 
-    const user = await this.userService.findOneById(refreshPayload.sub);
+    const user = await this.userService.findById(refreshPayload.sub);
     if (user.refreshToken != refreshToken)
       throw new UnauthorizedException(null, 'refresh token is obsolete');
     return await this.login(user, userAgent);

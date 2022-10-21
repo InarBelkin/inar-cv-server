@@ -11,29 +11,23 @@ export class UsersService {
   ) {}
 
   async findByUsername(username: string): Promise<User | undefined> {
-    const user = (
-      await this.usersRepository.find({
-        where: { username: username },
-      })
-    )[0];
+    const user = await this.usersRepository
+      .createQueryBuilder('user')
+      .where('LOWER(user.username) = LOWER(:username)', { username })
+      .getOne();
     return user;
   }
 
   async findByEmail(email: string): Promise<User | undefined> {
-    const user = (
-      await this.usersRepository.find({
-        where: { email: email },
-      })
-    )[0];
+    const user = await this.usersRepository
+      .createQueryBuilder('user')
+      .where('LOWER(user.email) = LOWER(:email)', { email })
+      .getOne();
     return user;
   }
 
-  async findOneById(id: number): Promise<User | undefined> {
-    const user = (
-      await this.usersRepository.find({
-        where: { id: id },
-      })
-    )[0];
+  async findById(id: number): Promise<User | undefined> {
+    const user = (await this.usersRepository.find({ where: { id } }))[0];
     return user;
   }
 
@@ -43,9 +37,7 @@ export class UsersService {
   }
 
   async updateRefreshToken(userId: number, refreshToken: string | null) {
-    const user = (
-      await this.usersRepository.find({ where: { id: userId } })
-    )[0];
+    const user = await this.findById(userId);
     user.refreshToken = refreshToken;
     await this.usersRepository.save(user);
   }
