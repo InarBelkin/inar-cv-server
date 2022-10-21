@@ -1,17 +1,19 @@
 import {
-  Controller,
-  Request,
-  Post,
-  UseGuards,
-  Get,
-  Req,
   Body,
+  Controller,
+  Get,
+  Patch,
+  Post,
+  Req,
+  Request,
+  UseGuards,
 } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './jwt.strategy';
 import { LocalAuthGuard } from './local.strategy';
-import { RegisterDto } from './auth.dto';
+import { RefreshDto, RegisterDto } from './auth.dto';
+import { Role } from '../roles/roles';
+import { RequireJwtRoles } from '../roles/roles.decorator';
 
 @Controller('auth')
 export class AuthController {
@@ -28,13 +30,26 @@ export class AuthController {
     return this.authService.login(req.user, req.headers['user-agent']);
   }
 
-  //
-  // @Post()
-  // async refresh() {}
+  @Patch('refresh')
+  async refresh(@Body() dto: RefreshDto, @Req() req) {
+    return this.authService.refresh(dto, req.headers['user-agent']);
+  }
 
   @UseGuards(JwtAuthGuard)
   @Get('profile')
   getProfile(@Request() req) {
     return req.user;
+  }
+
+  @RequireJwtRoles(Role.User)
+  @Get('roles')
+  getRoles(@Request() req) {
+    return req.user;
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('logout')
+  async logOut(@Req() req) {
+    await this.authService.logout(req.user);
   }
 }

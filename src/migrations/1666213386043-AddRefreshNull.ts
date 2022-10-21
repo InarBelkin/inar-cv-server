@@ -1,11 +1,11 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class AddRefresh1666212457198 implements MigrationInterface {
-  name = 'AddRefresh1666212457198';
+export class AddRefreshNull1666213386043 implements MigrationInterface {
+  name = 'AddRefreshNull1666213386043';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(
-      `ALTER TABLE "user" ADD "refreshToken" character varying NOT NULL`,
+      `ALTER TABLE "user" ADD "refreshToken" character varying`,
     );
   }
 

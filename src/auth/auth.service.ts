@@ -1,10 +1,12 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { User } from '../users/users.entity';
 import { Role } from '../roles/roles';
-import { RegisterDto } from './auth.dto';
+import { RefreshDto, RefreshPayload, RegisterDto } from './auth.dto';
+import { use } from 'passport';
+import { UserDto } from '../users/users.dto';
 
 @Injectable()
 export class AuthService {
@@ -43,24 +45,55 @@ export class AuthService {
     return { success: true, message: 'Registration is successful' };
   }
 
-  async validateUser(username: string, pass: string) {
+  async validateUser(username: string, pass: string): Promise<UserDto | null> {
     const user = await this.userService.findOneWholly(username);
-    if (user && (await bcrypt.compare(user.hashPassword, pass))) {
+    if (user && (await bcrypt.compare(pass, user.hashPassword))) {
       const { hashPassword, ...result } = user;
       return result;
     }
     return null;
   }
 
-  async login(user: any, userAgent: any) {
-    const accessPayload = { username: user.username, sub: user.Id.toString() };
+  async login(user: UserDto, userAgent: any) {
+    const accessPayload = {
+      username: user.username,
+      sub: user.id,
+      roles: user.roles,
+    };
     const refreshPayload = {
+      username: user.username,
+      sub: user.id,
+      roles: user.roles,
       userAgent: userAgent,
       random: Math.random().toString(),
+    } as RefreshPayload;
+
+    const res = {
+      accessToken: this.jwtService.sign(accessPayload),
+      refreshToken: this.jwtService.sign(refreshPayload, {
+        expiresIn: '2 days',
+      }),
     };
 
-    return {
-      access_token: this.jwtService.sign(accessPayload),
-    };
+    await this.userService.updateRefreshToken(user.id, res.refreshToken);
+    return res;
+  }
+
+  async refresh({ refreshToken }: RefreshDto, userAgent: any) {
+    let refreshPayload: RefreshPayload;
+    try {
+      refreshPayload = this.jwtService.verify(refreshToken);
+    } catch (e) {
+      throw new UnauthorizedException(e, 'jwt expired');
+    }
+
+    const user = await this.userService.findOneById(refreshPayload.sub);
+    if (user.refreshToken != refreshToken)
+      throw new UnauthorizedException(null, 'refresh token is obsolete');
+    return await this.login(user, userAgent);
+  }
+
+  async logout(user: UserDto) {
+    await this.userService.updateRefreshToken(user.id, null);
   }
 }

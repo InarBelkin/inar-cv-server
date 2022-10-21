@@ -11,6 +11,6 @@ export class User {
   hashPassword: string;
   @Column('text', { array: true })
   roles: Role[];
-  @Column()
-  refreshToken: string;
+  @Column({ nullable: true })
+  refreshToken: string | null;
 }
