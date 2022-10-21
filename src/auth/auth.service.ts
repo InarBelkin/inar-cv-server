@@ -5,21 +5,30 @@ import * as bcrypt from 'bcrypt';
 import { User } from '../users/users.entity';
 import { Role } from '../roles/roles';
 import { RefreshDto, RefreshPayload, RegisterDto } from './auth.dto';
-import { use } from 'passport';
 import { UserDto } from '../users/users.dto';
+import { randomUUID } from 'crypto';
+import { MailService } from '../mail/mail.service';
 
 @Injectable()
 export class AuthService {
   constructor(
+    private mailService: MailService,
     private userService: UsersService,
     private jwtService: JwtService,
   ) {}
 
-  async register(registerDto: RegisterDto) {
-    if (await this.userService.findOneWholly(registerDto.username)) {
+  async registration(registerDto: RegisterDto) {
+    if (await this.userService.findByUsername(registerDto.username)) {
       return {
         success: false,
         message: 'This username is taken',
+      };
+    }
+
+    if (await this.userService.findByEmail(registerDto.email)) {
+      return {
+        success: false,
+        message: 'User with this email already exists',
       };
     }
 
@@ -37,21 +46,33 @@ export class AuthService {
 
     const user = {
       id: null,
+      email: registerDto.email,
+      isActivated: false,
+      refreshToken: null,
+      activationCode: randomUUID(),
       username: registerDto.username,
       hashPassword: await bcrypt.hash(registerDto.password, 10),
       roles: [Role.User],
     } as User;
     const created = await this.userService.create(user);
+    await this.mailService.sendActivationMail(
+      registerDto.email,
+      `${process.env.API_URL}/auth/activation/${user.activationCode}`,
+    );
     return { success: true, message: 'Registration is successful' };
   }
 
   async validateUser(username: string, pass: string): Promise<UserDto | null> {
-    const user = await this.userService.findOneWholly(username);
+    const user = await this.userService.findByUsername(username);
     if (user && (await bcrypt.compare(pass, user.hashPassword))) {
       const { hashPassword, ...result } = user;
       return result;
     }
     return null;
+  }
+
+  async activate(activationCode: string) {
+    await this.userService.activate(activationCode);
   }
 
   async login(user: UserDto, userAgent: any) {

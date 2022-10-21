@@ -8,6 +8,12 @@ export class User {
   @Column()
   username: string;
   @Column()
+  email: string;
+  @Column()
+  isActivated: boolean;
+  @Column()
+  activationCode: string;
+  @Column()
   hashPassword: string;
   @Column('text', { array: true })
   roles: Role[];

@@ -2,8 +2,10 @@ import {
   Body,
   Controller,
   Get,
+  Param,
   Patch,
   Post,
+  Redirect,
   Req,
   Request,
   UseGuards,
@@ -21,7 +23,7 @@ export class AuthController {
 
   @Post('registration')
   async registration(@Body() registerDto: RegisterDto) {
-    return await this.authService.register(registerDto);
+    return await this.authService.registration(registerDto);
   }
 
   @UseGuards(LocalAuthGuard)
@@ -51,5 +53,11 @@ export class AuthController {
   @Get('logout')
   async logOut(@Req() req) {
     await this.authService.logout(req.user);
+  }
+
+  @Get('activation/:code')
+  @Redirect(`${process.env.CLIENT_URL}`)
+  async Activate(@Param('code') code: string) {
+    await this.authService.activate(code);
   }
 }
