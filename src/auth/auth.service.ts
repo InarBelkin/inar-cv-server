@@ -32,6 +32,12 @@ export class AuthService {
       };
     }
 
+    if (!/^\S+@\S+\.\S+$/.test(registerDto.email)) {
+      return {
+        success: false,
+        message: 'Email is not valid',
+      };
+    }
     if (
       !new RegExp('^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{8,}$').test(
         registerDto.password,
@@ -59,12 +65,19 @@ export class AuthService {
       registerDto.email,
       `${process.env.API_URL}/auth/activation/${user.activationCode}`,
     );
-    return { success: true, message: 'Registration is successful' };
+    return {
+      success: true,
+      message: 'Registration is successful, go to your email to activate',
+    };
   }
 
   async validateUser(username: string, pass: string): Promise<UserDto | null> {
     const user = await this.userService.findByUsername(username);
-    if (user && (await bcrypt.compare(pass, user.hashPassword))) {
+    if (
+      user &&
+      user.isActivated &&
+      (await bcrypt.compare(pass, user.hashPassword))
+    ) {
       const result = {
         id: user.id,
         email: user.email,
