@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Tag } from './tags.entity';
@@ -15,6 +15,7 @@ export class TagsService {
 
   async getOne(id: number) {
     const tag = (await this.tagRepos.find({ where: { id: id } }))[0];
+    if (!tag) throw new NotFoundException("This tag doesn't exist");
     return tag as TagGetDto;
   }
 

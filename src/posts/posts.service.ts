@@ -1,4 +1,9 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import {
   OnePostDto,
   PostCreateDto,
@@ -32,6 +37,7 @@ export class PostsService {
         .where('inner-tag.id IN (:tId)', { tId: filter.tagId });
     }
     query = query.leftJoinAndSelect('post.tags', 'tag');
+    query = query.orderBy('post.date', 'DESC');
     if (filter.limit && filter.page) {
       query = query.skip((filter.page - 1) * filter.limit).take(filter.limit);
     }
@@ -67,6 +73,7 @@ export class PostsService {
   public async update(id: number, data: DeepPartial<PostUpdateDto>) {
     data.id = id;
     const post = await this.postRepository.preload(data);
+    if (!post) throw new NotFoundException("This post doesn't exists");
     return await this.postRepository.save(post);
   }
 

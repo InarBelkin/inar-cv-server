@@ -43,9 +43,9 @@ export class AuthController {
     return req.user;
   }
 
-  @RequireJwtRoles(Role.User)
+  @RequireJwtRoles(Role.Admin)
   @Get('roles')
-  getRoles(@Request() req) {
+  testRoles(@Request() req) {
     return req.user;
   }
 
