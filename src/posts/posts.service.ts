@@ -31,10 +31,10 @@ export class PostsService {
       'post.contentPreview',
       'post.date',
     ]);
-    if (filter.tagId) {
+    if (filter.tagName) {
       query = query
         .innerJoin('post.tags', 'inner-tag')
-        .where('inner-tag.id IN (:tId)', { tId: filter.tagId });
+        .where('inner-tag.name IN (:tName)', { tName: filter.tagName });
     }
     query = query.leftJoinAndSelect('post.tags', 'tag');
     query = query.orderBy('post.date', 'DESC');

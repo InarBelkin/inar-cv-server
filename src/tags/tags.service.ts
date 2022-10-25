@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Tag } from './tags.entity';
 import { TagCreateDto, TagGetDto } from './tags.dto';
+import { InsertionDto } from '../additional/dto/insertion.dto';
 
 @Injectable()
 export class TagsService {
@@ -19,9 +20,12 @@ export class TagsService {
     return tag as TagGetDto;
   }
 
-  async create(data: TagCreateDto) {
+  async create(data: TagCreateDto): Promise<InsertionDto> {
+    const tag = await this.tagRepos.find({ where: { name: data.name } });
+    if (tag.length != 0)
+      return { success: false, message: 'tag with this name already exists' };
     const createdTag = await this.tagRepos.save({ name: data.name });
-    return { inserted: createdTag };
+    return { inserted: createdTag, success: true, message: 'success' };
   }
 
   async update(id: number, data: Partial<TagCreateDto>) {

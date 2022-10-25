@@ -14,7 +14,7 @@ export class PostListDto {
 export class PostListFilter {
   page: number | undefined;
   limit: number | undefined;
-  tagId: number | undefined;
+  tagName: string | undefined;
 }
 
 export class OnePostDto {
