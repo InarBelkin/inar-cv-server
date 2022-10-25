@@ -22,7 +22,10 @@ export class Post {
   content: string;
 
   @Column()
-  date: Date;
+  creationDate: Date;
+
+  @Column({ nullable: true })
+  publicationDate: Date | null;
 
   @ManyToMany(() => Tag, (tag) => tag.posts)
   @JoinTable()

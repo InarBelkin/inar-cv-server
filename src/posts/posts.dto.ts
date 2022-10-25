@@ -1,12 +1,13 @@
-export class PostListItemDto {
+export interface PostListItemDto {
   id: number;
   title: string;
+  creationDate: Date;
+  publicationDate: Date;
   contentPreview: string;
-  date: Date;
   tags: { id: number; name: string }[];
 }
 
-export class PostListDto {
+export interface PostListDto {
   data: PostListItemDto[];
   pageCount: number | null;
 }
@@ -17,25 +18,28 @@ export class PostListFilter {
   tagName: string | undefined;
 }
 
-export class OnePostDto {
+export interface OnePostDto {
   id: number;
   title: string;
-  date: Date;
+  creationDate: Date;
+  publicationDate: Date | null;
   contentPreview: string;
   content: string;
   tags: { id: number; name: string }[];
 }
 
-export class PostCreateDto {
+export interface PostCreateDto {
   title: string;
   contentPreview: string;
   content: string;
+  publicationDate: Date | null;
   tags: { id: number }[];
 }
 
-export class PostUpdateDto {
+export interface PostUpdateDto {
   id: number;
   title: string;
+  publicationDate: Date | null;
   contentPreview: string;
   content: string;
   tags: { id: number }[];

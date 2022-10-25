@@ -25,11 +25,17 @@ export class PostsService {
   public async getAll(filter: PostListFilter) {
     //TODO: add date in post
     let query = this.postRepository.createQueryBuilder('post');
+    query = query
+      .where('post.publicationDate IS NOT NULL')
+      .andWhere('post.publicationDate <= :currentDate', {
+        currentDate: new Date().toISOString(),
+      });
     query = query.select([
       'post.id',
       'post.title',
       'post.contentPreview',
-      'post.date',
+      'post.creationDate',
+      'post.publicationDate',
     ]);
     if (filter.tagName) {
       query = query
@@ -37,7 +43,7 @@ export class PostsService {
         .where('inner-tag.name IN (:tName)', { tName: filter.tagName });
     }
     query = query.leftJoinAndSelect('post.tags', 'tag');
-    query = query.orderBy('post.date', 'DESC');
+    query = query.orderBy('post.publicationDate', 'DESC');
     if (filter.limit && filter.page) {
       query = query.skip((filter.page - 1) * filter.limit).take(filter.limit);
     }
@@ -60,12 +66,13 @@ export class PostsService {
 
   public async create(data: PostCreateDto) {
     const post = {
-      date: new Date(),
+      creationDate: new Date(),
+      publicationDate: data.publicationDate,
       content: data.content,
       tags: data.tags,
       contentPreview: data.contentPreview,
       title: data.title,
-    };
+    } as Post;
     const createdPost = await this.postRepository.save(post);
     return { inserted: createdPost };
   }
