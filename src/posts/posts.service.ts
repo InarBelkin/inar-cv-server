@@ -15,6 +15,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Post } from './post.entity';
 import { DeepPartial, Repository } from 'typeorm';
+import { InsertionDto } from '../additional/dto/insertion.dto';
 
 @Injectable()
 export class PostsService {
@@ -25,11 +26,20 @@ export class PostsService {
   public async getAll(filter: PostListFilter) {
     //TODO: add date in post
     let query = this.postRepository.createQueryBuilder('post');
-    query = query
-      .where('post.publicationDate IS NOT NULL')
-      .andWhere('post.publicationDate <= :currentDate', {
-        currentDate: new Date().toISOString(),
-      });
+    if (!filter.notPublished) {
+      query = query
+        .where('post.publicationDate IS NOT NULL')
+        .andWhere('post.publicationDate <= :currentDate', {
+          currentDate: new Date().toISOString(),
+        });
+    } else {
+      query = query
+        .where('post.publicationDate IS NULL')
+        .orWhere('post.publicationDate <= :currentDate', {
+          currentDate: new Date().toISOString(),
+        });
+    }
+
     query = query.select([
       'post.id',
       'post.title',
@@ -43,7 +53,11 @@ export class PostsService {
         .where('inner-tag.name IN (:tName)', { tName: filter.tagName });
     }
     query = query.leftJoinAndSelect('post.tags', 'tag');
-    query = query.orderBy('post.publicationDate', 'DESC');
+    query = query.orderBy(
+      !filter.notPublished ? 'post.publicationDate' : 'post.creationDate',
+      'DESC',
+    );
+
     if (filter.limit && filter.page) {
       query = query.skip((filter.page - 1) * filter.limit).take(filter.limit);
     }
@@ -74,7 +88,11 @@ export class PostsService {
       title: data.title,
     } as Post;
     const createdPost = await this.postRepository.save(post);
-    return { inserted: createdPost };
+    return {
+      inserted: createdPost,
+      success: true,
+      message: 'post successfully created',
+    } as InsertionDto;
   }
 
   public async update(id: number, data: DeepPartial<PostUpdateDto>) {

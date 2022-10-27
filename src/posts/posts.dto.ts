@@ -16,6 +16,7 @@ export class PostListFilter {
   page: number | undefined;
   limit: number | undefined;
   tagName: string | undefined;
+  notPublished: boolean | undefined;
 }
 
 export interface OnePostDto {
