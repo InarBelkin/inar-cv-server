@@ -17,7 +17,6 @@ import { Post } from './post.entity';
 import { Brackets, DeepPartial, Repository } from 'typeorm';
 import { InsertionDto } from '../additional/dto/insertion.dto';
 import { CommentsService } from '../comments/comments.service';
-import { query } from 'express';
 
 @Injectable()
 export class PostsService {

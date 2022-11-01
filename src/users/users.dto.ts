@@ -1,4 +1,3 @@
-import { Column, PrimaryGeneratedColumn } from 'typeorm';
 import { Role } from '../roles/roles';
 
 export class UserDto {
