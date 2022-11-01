@@ -3,9 +3,11 @@ import {
   Entity,
   JoinTable,
   ManyToMany,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Tag } from '../tags/tags.entity';
+import { CommentEntity } from '../comments/comments.entity';
 
 @Entity()
 export class Post {
@@ -30,4 +32,7 @@ export class Post {
   @ManyToMany(() => Tag, (tag) => tag.posts)
   @JoinTable()
   tags: Tag[];
+
+  @OneToMany(() => CommentEntity, (comment) => comment.post)
+  comments: CommentEntity[];
 }

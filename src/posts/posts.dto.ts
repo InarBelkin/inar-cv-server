@@ -1,3 +1,5 @@
+import { CommentListItemDto } from '../comments/comments.dto';
+
 export interface PostListItemDto {
   id: number;
   title: string;
@@ -27,6 +29,7 @@ export interface OnePostDto {
   contentPreview: string;
   content: string;
   tags: { id: number; name: string }[];
+  comments: CommentListItemDto[];
 }
 
 export interface PostCreateDto {

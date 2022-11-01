@@ -8,6 +8,7 @@ import { AuthModule } from './auth/auth.module';
 import { LoggerMiddleware } from './MiddleHuyna';
 import { RolesModule } from './roles/roles.module';
 import { MailModule } from './mail/mail.module';
+import { CommentsModule } from './comments/comments.module';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { MailModule } from './mail/mail.module';
     AuthModule,
     RolesModule,
     MailModule,
+    CommentsModule,
   ],
   controllers: [],
   providers: [],

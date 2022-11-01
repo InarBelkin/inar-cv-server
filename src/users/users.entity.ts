@@ -1,5 +1,6 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { Role } from '../roles/roles';
+import { CommentEntity } from '../comments/comments.entity';
 
 @Entity()
 export class User {
@@ -19,4 +20,6 @@ export class User {
   roles: Role[];
   @Column({ nullable: true })
   refreshToken: string | null;
+  @OneToMany(() => CommentEntity, (comment) => comment.user)
+  comments: Comment[];
 }

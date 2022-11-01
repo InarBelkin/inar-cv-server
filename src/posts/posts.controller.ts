@@ -19,7 +19,7 @@ export class PostsController {
 
   @Get()
   public async getAll(@Query() query: PostListFilter) {
-    return await this.postsService.getAll(query);
+    return await this.postsService.getAll2(query);
   }
 
   @Get('/:id')
