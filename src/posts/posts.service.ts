@@ -120,6 +120,10 @@ export class PostsService {
   }
 
   public async delete(id: number) {
-    return await this.postRepository.delete({ id: id });
+    await this.postRepository.delete({ id: id });
+    return {
+      success: true,
+      message: 'Post successfully deleted',
+    } as InsertionDto;
   }
 }
