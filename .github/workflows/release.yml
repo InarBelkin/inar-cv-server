@@ -27,3 +27,16 @@ jobs:
           file: ./Dockerfile
           push: true
           tags: ${{ secrets.DOCKER_HUB_USERNAME }}/inar_cv:latest
+
+      - name: Deploy to VDS
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.VDS_HOST }}
+          username: ${{ secrets.VDS_USERNAME }}
+          key: ${{ secrets.VDS_PRIVATE_KEY }}
+          port: 22
+          script: |
+            cd composes/traefik/
+            docker-compose pull
+            docker-compose up --force-recreate -d
+            
