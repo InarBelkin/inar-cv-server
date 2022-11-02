@@ -9,6 +9,7 @@ import { LoggerMiddleware } from './MiddleHuyna';
 import { RolesModule } from './roles/roles.module';
 import { MailModule } from './mail/mail.module';
 import { CommentsModule } from './comments/comments.module';
+import { join } from 'path';
 
 @Module({
   imports: [
@@ -25,7 +26,7 @@ import { CommentsModule } from './comments/comments.module';
       database: process.env.POSTGRES_DB_NAME,
       entities: [],
       autoLoadEntities: true,
-      migrations: [process.env.POSTGRES_MIGRATIONS_PATH],
+      migrations: [join(__dirname, './migrations/{.ts,*.js}')],
       migrationsTableName: '_migrations',
       migrationsRun: Boolean(process.env.POSTGRES_MIGRATIONS_RUN),
       synchronize: false,

@@ -9,7 +9,7 @@ COPY  . .
 
 COPY ./dist ./dist
 
-RUN yarn install
+RUN yarn install --frozen-lockfile
 
 CMD ["yarn", "run", "start:debug"]
 
@@ -24,7 +24,7 @@ WORKDIR /app
 COPY package.json ./
 COPY yarn.lock ./
 
-RUN yarn install
+RUN yarn install --frozen-lockfile
 
 COPY  . .
 
@@ -32,7 +32,7 @@ ENV NODE_ENV production
 
 RUN yarn run build
 
-RUN yarn install --prod && yarn cache clean
+RUN yarn install --frozen-lockfile --prod && yarn cache clean
 
 #######
 #Production
