@@ -39,4 +39,3 @@ jobs:
             cd composes/traefik/
             docker-compose pull
             docker-compose up --force-recreate -d
-            
