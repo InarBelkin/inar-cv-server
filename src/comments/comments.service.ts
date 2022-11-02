@@ -43,6 +43,7 @@ export class CommentsService {
         date: true,
         user: { id: true, username: true },
       },
+      order: { date: 'ASC' },
     })) as CommentListItemDto[];
     return comments;
   }
