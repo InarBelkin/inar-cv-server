@@ -36,7 +36,7 @@ jobs:
           key: ${{ secrets.VDS_PRIVATE_KEY }}
           port: 22
           script: |
-            cd composes/traefik/
+            cd inarcv/
             docker-compose pull
             docker-compose up --force-recreate -d
             docker image prune -f
